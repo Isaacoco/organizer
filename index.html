@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="ATELIER PAUL">
+    <meta name="theme-color" content="#D19028">
+    
+    <title>Focus Timer - ATELIER PAUL</title>
+    
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%23D19028' width='100' height='100' rx='20'/><text x='50' y='70' font-size='60' text-anchor='middle' fill='white'>⏱️</text></svg>">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        :root {
+            --gold: #D19028;
+            --gold-dark: #B87B1F;
+            --bg: #000000;
+            --card: #1C1C1E;
+            --border: #38383A;
+            --text: #FFFFFF;
+            --text-secondary: #8E8E93;
+            --success: #30D158;
+            --error: #FF453A;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            padding-bottom: 80px;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, var(--gold), var(--gold-dark));
+            padding: 20px;
+            text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 4px 20px rgba(209, 144, 40, 0.3);
+        }
+        
+        .header h1 {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        
+        .header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--card);
+            border-top: 1px solid var(--border);
+            display: flex;
+            padding: 10px 0;
+            padding-bottom: max(10px, env(safe-area-inset-bottom));
+            z-index: 99;
+        }
+        
+        .nav-item {
+            flex: 1;
+            text-align: center;
+            padding: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border-bottom: 3px solid transparent;
+        }
+        
+        .nav-item.active {
+            color: var(--gold);
+            border-bottom-color: var(--gold);
+        }
+        
+        .nav-icon {
+            font-size: 24px;
+            display: block;
+            margin-bottom: 4px;
+        }
+        
+        .nav-label {
+            font-size: 11px;
+            font-weight: 600;
+        }
+        
+        .content {
+            padding: 20px;
+            display: none;
+        }
+        
+        .content.active {
+            display: block;
+            animation: fadeIn 0.3s;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .card {
+            background: var(--card);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 16px;
+            border: 1px solid var(--border);
+        }
+        
+        .card-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+        
+        .timer-display {
+            font-size: 56px;
+            font-weight: 700;
+            text-align: center;
+            margin: 30px 0;
+            font-variant-numeric: tabular-nums;
+        }
+        
+        .btn-main {
+            width: 100%;
+            padding: 20px;
+            border-radius: 12px;
+            border: none;
+            font-size: 20px;
+            font-weight: 700;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-main:active {
+            transform: scale(0.98);
+        }
+        
+        .btn-start {
+            background: linear-gradient(135deg, var(--gold), var(--gold-dark));
+        }
+        
+        .btn-stop {
+            background: var(--error);
+        }
+        
+        .running-text {
+            text-align: center;
+            margin-top: 15px;
+            color: var(--success);
+            font-weight: 600;
+        }
+        
+        .progress-stats {
+            display: flex;
+            justify-content: space-around;
+            margin: 20px 0;
+        }
+        
+        .stat {
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--gold);
+            margin-bottom: 4px;
+        }
+        
+        .stat-label {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+        
+        .progress-bar-container {
+            height: 12px;
+            background: var(--border);
+            border-radius: 6px;
+            overflow: hidden;
+            margin-bottom: 8px;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: var(--gold);
+            border-radius: 6px;
+            transition: width 0.5s;
+        }
+        
+        .progress-percent {
+            text-align: center;
+            font-size: 14px;
+            color: var(--text-secondary);
+            font-weight: 600;
+        }
+        
+        .history-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .history-date {
+            font-size: 15px;
+            color: var(--text);
+        }
+        
+        .history-duration {
+            font-size: 17px;
+            font-weight: 700;
+            color: var(--gold);
+        }
+        
+        .empty-text {
+            text-align: center;
+            color: var(--text-secondary);
+            padding: 40px 20px;
+            font-size: 15px;
+            line-height: 1.6;
+        }
+        
+        .checklist-item {
+            display: flex;
+            align-items: center;
+            padding: 16px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .checklist-item:active {
+            transform: scale(0.98);
+        }
+        
+        .checklist-item.checked {
+            background: rgba(48, 209, 88, 0.1);
+            border-color: var(--success);
+        }
+        
+        .checkbox {
+            width: 28px;
+            height: 28px;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            margin-right: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            flex-shrink: 0;
+            transition: all 0.3s;
+        }
+        
+        .checklist-item.checked .checkbox {
+            background: var(--success);
+            border-color: var(--success);
+        }
+        
+        .checklist-text {
+            flex: 1;
+            font-size: 16px;
+        }
+        
+        .checklist-item.checked .checklist-text {
+            text-decoration: line-through;
+            opacity: 0.6;
+        }
+        
+        .btn-delete-task {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            background: transparent;
+            border: none;
+            color: var(--error);
+            font-size: 20px;
+            cursor: pointer;
+            margin-left: 8px;
+            display: none;
+        }
+        
+        .checklist-item:hover .btn-delete-task {
+            display: block;
+        }
+        
+        .btn-add {
+            width: 100%;
+            padding: 16px;
+            background: var(--border);
+            border: 2px dashed var(--text-secondary);
+            border-radius: 12px;
+            color: var(--text-secondary);
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-add:active {
+            transform: scale(0.98);
+        }
+        
+        input[type="text"] {
+            width: 100%;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            color: var(--text);
+            padding: 16px;
+            font-size: 16px;
+            font-family: inherit;
+            margin-bottom: 12px;
+        }
+        
+        input:focus {
+            outline: none;
+            border-color: var(--gold);
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .modal.show {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: var(--card);
+            border-radius: 20px;
+            padding: 24px;
+            max-width: 400px;
+            width: 100%;
+        }
+        
+        .modal-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+        
+        .modal-buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 16px;
+        }
+        
+        .btn-modal {
+            flex: 1;
+            padding: 14px;
+            border-radius: 10px;
+            border: none;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        
+        .btn-cancel {
+            background: var(--border);
+            color: var(--text);
+        }
+        
+        .btn-confirm {
+            background: var(--gold);
+            color: white;
+        }
+        
+        .btn-delete {
+            background: var(--error);
+            color: white;
+        }
+        
+        .reset-badge {
+            display: inline-block;
+            background: var(--gold);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-left: 8px;
+        }
+        
+        .btn-reset {
+            width: 100%;
+            padding: 12px;
+            background: var(--border);
+            border: 1px solid var(--gold);
+            border-radius: 10px;
+            color: var(--gold);
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 12px;
+        }
+        
+        .checklist-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        
+        .progress-indicator {
+            font-size: 14px;
+            color: var(--text-secondary);
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>⏱️ ATELIER PAUL</h1>
+        <p>Focus Timer & Checklist</p>
+    </div>
+    
+    <div class="content active" id="timer-content">
+        <div class="card">
+            <div class="timer-display" id="timer-display">0h 00m 00s</div>
+            <button class="btn-main btn-start" id="timer-btn" onclick="toggleTimer()">
+                ▶️ START
+            </button>
+            <div class="running-text" id="running-text" style="display: none;">
+                🔥 Session en cours...
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-title">📊 Ce mois-ci</div>
+            <div class="progress-stats">
+                <div class="stat">
+                    <div class="stat-value" id="hours-done">0h</div>
+                    <div class="stat-label">Réalisées</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value">10h</div>
+                    <div class="stat-label">Objectif</div>
+                </div>
+            </div>
+            <div class="progress-bar-container">
+                <div class="progress-bar" id="progress-bar" style="width: 0%"></div>
+            </div>
+            <div class="progress-percent" id="progress-percent">0%</div>
+        </div>
+        
+        <div class="card">
+            <div class="card-title">📋 Historique</div>
+            <div id="history-list">
+                <div class="empty-text">Aucune session enregistrée.<br>Lancez votre premier timer ! 🚀</div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="content" id="checklist-content">
+        <div class="card">
+            <div class="checklist-header">
+                <div>
+                    <div class="card-title" style="margin-bottom: 4px;">
+                        ✅ À faire 🔄
+                        <span class="reset-badge" id="current-month">Février</span>
+                    </div>
+                    <div class="progress-indicator" id="checklist-progress">0/0 complétées</div>
+                </div>
+            </div>
+            <div id="checklist-items"></div>
+            <button class="btn-add" onclick="showAddModal()">+ Ajouter une tâche</button>
+            <button class="btn-reset" onclick="resetChecklist()">🔄 Nouveau mois - Décocher tout</button>
+        </div>
+    </div>
+    
+    <div class="bottom-nav">
+        <div class="nav-item active" onclick="switchTab('timer')">
+            <span class="nav-icon">⏱️</span>
+            <span class="nav-label">Timer</span>
+        </div>
+        <div class="nav-item" onclick="switchTab('checklist')">
+            <span class="nav-icon">✅</span>
+            <span class="nav-label">À faire</span>
+        </div>
+    </div>
+    
+    <div class="modal" id="add-modal">
+        <div class="modal-content">
+            <div class="modal-title">➕ Nouvelle tâche</div>
+            <input type="text" id="new-task-input" placeholder="Ex: Envoyer facture ATELIER PAUL">
+            <div class="modal-buttons">
+                <button class="btn-modal btn-cancel" onclick="hideAddModal()">Annuler</button>
+                <button class="btn-modal btn-confirm" onclick="addTask()">Ajouter</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="modal" id="stop-modal">
+        <div class="modal-content">
+            <div class="modal-title">⏹️ Session terminée</div>
+            <p style="color: var(--text-secondary); margin-bottom: 16px;">
+                Durée: <strong id="session-duration" style="color: var(--gold);">1h 23m</strong>
+            </p>
+            <p style="color: var(--text-secondary);">Enregistrer cette session ?</p>
+            <div class="modal-buttons">
+                <button class="btn-modal btn-cancel" onclick="cancelSession()">Annuler</button>
+                <button class="btn-modal btn-confirm" onclick="saveSession()">Enregistrer</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Tâches récurrentes par défaut (VOS vraies tâches)
+        const DEFAULT_TASKS = [
+            'PASS NAVIGO',
+            'ENVOYÉ JUSTIFICATIF',
+            'FACTURE (ATELIER PAUL)',
+            'DÉCLARATION URSSAF (1166€ max avant 31/03)',
+            '95 papa assurance voiture',
+            'Acheter PNEU',
+            'RIB Compte AMELI'
+        ];
+        
+        let timerInterval = null;
+        let seconds = 0;
+        let isRunning = false;
+        let sessions = [];
+        let checklist = [];
+        let currentMonth = new Date().getMonth();
+        
+        function loadData() {
+            const savedSessions = localStorage.getItem('sessions');
+            const savedChecklist = localStorage.getItem('checklist');
+            const savedMonth = localStorage.getItem('checklistMonth');
+            
+            if (savedSessions) {
+                sessions = JSON.parse(savedSessions);
+                updateStats();
+                renderHistory();
+            }
+            
+            if (savedChecklist) {
+                checklist = JSON.parse(savedChecklist);
+            } else {
+                // Première installation : créer les tâches par défaut
+                checklist = DEFAULT_TASKS.map(text => ({
+                    text: text,
+                    checked: false
+                }));
+                localStorage.setItem('checklist', JSON.stringify(checklist));
+            }
+            
+            if (savedMonth && parseInt(savedMonth) !== currentMonth) {
+                resetChecklistForNewMonth();
+            }
+            
+            renderChecklist();
+            updateMonthBadge();
+        }
+        
+        function toggleTimer() {
+            if (isRunning) {
+                stopTimer();
+            } else {
+                startTimer();
+            }
+        }
+        
+        function startTimer() {
+            isRunning = true;
+            document.getElementById('timer-btn').className = 'btn-main btn-stop';
+            document.getElementById('timer-btn').innerHTML = '⏹️ STOP';
+            document.getElementById('running-text').style.display = 'block';
+            
+            timerInterval = setInterval(() => {
+                seconds++;
+                updateTimerDisplay();
+                
+                if (seconds === 3600) {
+                    if ('Notification' in window && Notification.permission === 'granted') {
+                        new Notification('⏰ 1 heure écoulée !', {
+                            body: 'Votre session de focus est terminée.'
+                        });
+                    }
+                }
+            }, 1000);
+        }
+        
+        function stopTimer() {
+            if (seconds === 0) return;
+            
+            clearInterval(timerInterval);
+            isRunning = false;
+            
+            document.getElementById('session-duration').textContent = formatTime(seconds);
+            document.getElementById('stop-modal').classList.add('show');
+        }
+        
+        function cancelSession() {
+            seconds = 0;
+            updateTimerDisplay();
+            resetTimerButton();
+            document.getElementById('stop-modal').classList.remove('show');
+        }
+        
+        function saveSession() {
+            const duration = seconds / 3600;
+            const session = {
+                id: Date.now(),
+                date: new Date().toISOString(),
+                duration: duration
+            };
+            
+            sessions.unshift(session);
+            localStorage.setItem('sessions', JSON.stringify(sessions));
+            
+            seconds = 0;
+            updateTimerDisplay();
+            resetTimerButton();
+            updateStats();
+            renderHistory();
+            
+            document.getElementById('stop-modal').classList.remove('show');
+            
+            if ('Notification' in window && Notification.permission === 'granted') {
+                new Notification('✅ Session enregistrée !', {
+                    body: `${formatTime(duration * 3600)} ajoutées à ATELIER PAUL`
+                });
+            }
+        }
+        
+        function resetTimerButton() {
+            document.getElementById('timer-btn').className = 'btn-main btn-start';
+            document.getElementById('timer-btn').innerHTML = '▶️ START';
+            document.getElementById('running-text').style.display = 'none';
+        }
+        
+        function updateTimerDisplay() {
+            document.getElementById('timer-display').textContent = formatTime(seconds);
+        }
+        
+        function formatTime(totalSeconds) {
+            const hours = Math.floor(totalSeconds / 3600);
+            const minutes = Math.floor((totalSeconds % 3600) / 60);
+            const secs = totalSeconds % 60;
+            
+            return `${hours}h ${minutes.toString().padStart(2, '0')}m ${secs.toString().padStart(2, '0')}s`;
+        }
+        
+        function updateStats() {
+            const now = new Date();
+            const monthSessions = sessions.filter(s => {
+                const sessionDate = new Date(s.date);
+                return sessionDate.getMonth() === now.getMonth() && 
+                       sessionDate.getFullYear() === now.getFullYear();
+            });
+            
+            const total = monthSessions.reduce((acc, s) => acc + s.duration, 0);
+            const percent = Math.min(100, (total / 10) * 100);
+            
+            document.getElementById('hours-done').textContent = total.toFixed(1) + 'h';
+            document.getElementById('progress-bar').style.width = percent + '%';
+            document.getElementById('progress-percent').textContent = percent.toFixed(0) + '%';
+        }
+        
+        function renderHistory() {
+            const container = document.getElementById('history-list');
+            
+            if (sessions.length === 0) {
+                container.innerHTML = '<div class="empty-text">Aucune session enregistrée.<br>Lancez votre premier timer ! 🚀</div>';
+                return;
+            }
+            
+            container.innerHTML = sessions.slice(0, 20).map(s => {
+                const date = new Date(s.date);
+                const formatted = formatDate(date);
+                return `
+                    <div class="history-item">
+                        <div class="history-date">${formatted}</div>
+                        <div class="history-duration">${s.duration.toFixed(2)}h</div>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        function formatDate(date) {
+            const days = ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'];
+            const months = ['jan', 'fév', 'mar', 'avr', 'mai', 'juin', 'juil', 'août', 'sep', 'oct', 'nov', 'déc'];
+            return `${days[date.getDay()]} ${date.getDate()} ${months[date.getMonth()]}`;
+        }
+        
+        function renderChecklist() {
+            const container = document.getElementById('checklist-items');
+            
+            if (checklist.length === 0) {
+                container.innerHTML = '<div class="empty-text">Aucune tâche.<br>Ajoutez vos tâches récurrentes ! ✅</div>';
+                updateChecklistProgress();
+                return;
+            }
+            
+            container.innerHTML = checklist.map((task, index) => `
+                <div class="checklist-item ${task.checked ? 'checked' : ''}" onclick="toggleCheck(event, ${index})">
+                    <div class="checkbox">${task.checked ? '✓' : ''}</div>
+                    <div class="checklist-text">${task.text}</div>
+                    <button class="btn-delete-task" onclick="deleteTask(event, ${index})">🗑️</button>
+                </div>
+            `).join('');
+            
+            updateChecklistProgress();
+        }
+        
+        function toggleCheck(event, index) {
+            if (event.target.classList.contains('btn-delete-task')) return;
+            
+            checklist[index].checked = !checklist[index].checked;
+            localStorage.setItem('checklist', JSON.stringify(checklist));
+            renderChecklist();
+        }
+        
+        function deleteTask(event, index) {
+            event.stopPropagation();
+            
+            if (confirm(`Supprimer cette tâche ?\n"${checklist[index].text}"`)) {
+                checklist.splice(index, 1);
+                localStorage.setItem('checklist', JSON.stringify(checklist));
+                renderChecklist();
+            }
+        }
+        
+        function updateChecklistProgress() {
+            const total = checklist.length;
+            const checked = checklist.filter(t => t.checked).length;
+            document.getElementById('checklist-progress').textContent = `${checked}/${total} complétées`;
+        }
+        
+        function showAddModal() {
+            document.getElementById('add-modal').classList.add('show');
+            document.getElementById('new-task-input').value = '';
+            setTimeout(() => {
+                document.getElementById('new-task-input').focus();
+            }, 100);
+        }
+        
+        function hideAddModal() {
+            document.getElementById('add-modal').classList.remove('show');
+        }
+        
+        function addTask() {
+            const input = document.getElementById('new-task-input');
+            const text = input.value.trim();
+            
+            if (!text) return;
+            
+            checklist.push({
+                text: text,
+                checked: false
+            });
+            
+            localStorage.setItem('checklist', JSON.stringify(checklist));
+            renderChecklist();
+            hideAddModal();
+        }
+        
+        function resetChecklist() {
+            if (!confirm('🔄 Décocher toutes les tâches pour le nouveau mois ?')) return;
+            
+            checklist = checklist.map(task => ({
+                ...task,
+                checked: false
+            }));
+            
+            localStorage.setItem('checklist', JSON.stringify(checklist));
+            localStorage.setItem('checklistMonth', currentMonth.toString());
+            renderChecklist();
+        }
+        
+        function resetChecklistForNewMonth() {
+            checklist = checklist.map(task => ({
+                ...task,
+                checked: false
+            }));
+            localStorage.setItem('checklist', JSON.stringify(checklist));
+            localStorage.setItem('checklistMonth', currentMonth.toString());
+        }
+        
+        function updateMonthBadge() {
+            const months = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
+            document.getElementById('current-month').textContent = months[currentMonth];
+        }
+        
+        function switchTab(tab) {
+            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+            document.querySelectorAll('.content').forEach(content => content.classList.remove('active'));
+            
+            if (tab === 'timer') {
+                document.querySelector('.nav-item:nth-child(1)').classList.add('active');
+                document.getElementById('timer-content').classList.add('active');
+            } else {
+                document.querySelector('.nav-item:nth-child(2)').classList.add('active');
+                document.getElementById('checklist-content').classList.add('active');
+            }
+        }
+        
+        if ('Notification' in window && Notification.permission === 'default') {
+            Notification.requestPermission();
+        }
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            loadData();
+            
+            document.getElementById('new-task-input').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') addTask();
+            });
+        });
+        
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('data:text/javascript,');
+        }
+    </script>
+</body>
+</html>
