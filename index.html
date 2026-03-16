@@ -5,845 +5,580 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="ATELIER PAUL">
-    <meta name="theme-color" content="#D19028">
-    
-    <title>Focus Timer - ATELIER PAUL</title>
-    
-    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%23D19028' width='100' height='100' rx='20'/><text x='50' y='70' font-size='60' text-anchor='middle' fill='white'>⏱️</text></svg>">
-    
+    <meta name="apple-mobile-web-app-title" content="Organizer">
+    <meta name="theme-color" content="#000000">
+    <title>Organizer — Focus & Tasks</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&family=Share+Tech+Mono&display=swap" rel="stylesheet">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
+        *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+        :root{
+            --gold:#D19028;--gold-light:#F0B84A;--gold-dark:#A0701A;
+            --bg:#000;--card:rgba(255,255,255,0.04);--border:rgba(255,255,255,0.08);
+            --border-gold:rgba(209,144,40,0.3);--text:#fff;--text-sec:rgba(255,255,255,0.45);
+            --success:#34D399;--error:#F87171;
         }
-        
-        :root {
-            --gold: #D19028;
-            --gold-dark: #B87B1F;
-            --bg: #000000;
-            --card: #1C1C1E;
-            --border: #38383A;
-            --text: #FFFFFF;
-            --text-secondary: #8E8E93;
-            --success: #30D158;
-            --error: #FF453A;
-        }
-        
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
-            background: var(--bg);
-            color: var(--text);
-            overflow-x: hidden;
-            -webkit-font-smoothing: antialiased;
-            padding-bottom: 80px;
-        }
-        
-        .header {
-            background: linear-gradient(135deg, var(--gold), var(--gold-dark));
-            padding: 20px;
-            text-align: center;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            box-shadow: 0 4px 20px rgba(209, 144, 40, 0.3);
-        }
-        
-        .header h1 {
-            font-size: 24px;
-            font-weight: 700;
-            margin-bottom: 5px;
-        }
-        
-        .header p {
-            font-size: 14px;
-            opacity: 0.9;
-        }
-        
-        .bottom-nav {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: var(--card);
-            border-top: 1px solid var(--border);
-            display: flex;
-            padding: 10px 0;
-            padding-bottom: max(10px, env(safe-area-inset-bottom));
-            z-index: 99;
-        }
-        
-        .nav-item {
-            flex: 1;
-            text-align: center;
-            padding: 8px;
-            cursor: pointer;
-            transition: all 0.3s;
-            border-bottom: 3px solid transparent;
-        }
-        
-        .nav-item.active {
-            color: var(--gold);
-            border-bottom-color: var(--gold);
-        }
-        
-        .nav-icon {
-            font-size: 24px;
-            display: block;
-            margin-bottom: 4px;
-        }
-        
-        .nav-label {
-            font-size: 11px;
-            font-weight: 600;
-        }
-        
-        .content {
-            padding: 20px;
-            display: none;
-        }
-        
-        .content.active {
-            display: block;
-            animation: fadeIn 0.3s;
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        .card {
-            background: var(--card);
-            border-radius: 16px;
-            padding: 20px;
-            margin-bottom: 16px;
-            border: 1px solid var(--border);
-        }
-        
-        .card-title {
-            font-size: 20px;
-            font-weight: 700;
-            margin-bottom: 16px;
-        }
-        
-        .timer-display {
-            font-size: 56px;
-            font-weight: 700;
-            text-align: center;
-            margin: 30px 0;
-            font-variant-numeric: tabular-nums;
-        }
-        
-        .btn-main {
-            width: 100%;
-            padding: 20px;
-            border-radius: 12px;
-            border: none;
-            font-size: 20px;
-            font-weight: 700;
-            color: white;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        
-        .btn-main:active {
-            transform: scale(0.98);
-        }
-        
-        .btn-start {
-            background: linear-gradient(135deg, var(--gold), var(--gold-dark));
-        }
-        
-        .btn-stop {
-            background: var(--error);
-        }
-        
-        .running-text {
-            text-align: center;
-            margin-top: 15px;
-            color: var(--success);
-            font-weight: 600;
-        }
-        
-        .progress-stats {
-            display: flex;
-            justify-content: space-around;
-            margin: 20px 0;
-        }
-        
-        .stat {
-            text-align: center;
-        }
-        
-        .stat-value {
-            font-size: 32px;
-            font-weight: 700;
-            color: var(--gold);
-            margin-bottom: 4px;
-        }
-        
-        .stat-label {
-            font-size: 14px;
-            color: var(--text-secondary);
-        }
-        
-        .progress-bar-container {
-            height: 12px;
-            background: var(--border);
-            border-radius: 6px;
-            overflow: hidden;
-            margin-bottom: 8px;
-        }
-        
-        .progress-bar {
-            height: 100%;
-            background: var(--gold);
-            border-radius: 6px;
-            transition: width 0.5s;
-        }
-        
-        .progress-percent {
-            text-align: center;
-            font-size: 14px;
-            color: var(--text-secondary);
-            font-weight: 600;
-        }
-        
-        .history-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px 0;
-            border-bottom: 1px solid var(--border);
-        }
-        
-        .history-date {
-            font-size: 15px;
-            color: var(--text);
-        }
-        
-        .history-duration {
-            font-size: 17px;
-            font-weight: 700;
-            color: var(--gold);
-        }
-        
-        .empty-text {
-            text-align: center;
-            color: var(--text-secondary);
-            padding: 40px 20px;
-            font-size: 15px;
-            line-height: 1.6;
-        }
-        
-        .checklist-item {
-            display: flex;
-            align-items: center;
-            padding: 16px;
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            margin-bottom: 12px;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        
-        .checklist-item:active {
-            transform: scale(0.98);
-        }
-        
-        .checklist-item.checked {
-            background: rgba(48, 209, 88, 0.1);
-            border-color: var(--success);
-        }
-        
-        .checkbox {
-            width: 28px;
-            height: 28px;
-            border: 2px solid var(--border);
-            border-radius: 8px;
-            margin-right: 16px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 18px;
-            flex-shrink: 0;
-            transition: all 0.3s;
-        }
-        
-        .checklist-item.checked .checkbox {
-            background: var(--success);
-            border-color: var(--success);
-        }
-        
-        .checklist-text {
-            flex: 1;
-            font-size: 16px;
-        }
-        
-        .checklist-item.checked .checklist-text {
-            text-decoration: line-through;
-            opacity: 0.6;
-        }
-        
-        .btn-delete-task {
-            width: 32px;
-            height: 32px;
-            border-radius: 8px;
-            background: transparent;
-            border: none;
-            color: var(--error);
-            font-size: 20px;
-            cursor: pointer;
-            margin-left: 8px;
-            display: none;
-        }
-        
-        .checklist-item:hover .btn-delete-task {
-            display: block;
-        }
-        
-        .btn-add {
-            width: 100%;
-            padding: 16px;
-            background: var(--border);
-            border: 2px dashed var(--text-secondary);
-            border-radius: 12px;
-            color: var(--text-secondary);
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        
-        .btn-add:active {
-            transform: scale(0.98);
-        }
-        
-        input[type="text"] {
-            width: 100%;
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            color: var(--text);
-            padding: 16px;
-            font-size: 16px;
-            font-family: inherit;
-            margin-bottom: 12px;
-        }
-        
-        input:focus {
-            outline: none;
-            border-color: var(--gold);
-        }
-        
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.9);
-            z-index: 1000;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
-        
-        .modal.show {
-            display: flex;
-        }
-        
-        .modal-content {
-            background: var(--card);
-            border-radius: 20px;
-            padding: 24px;
-            max-width: 400px;
-            width: 100%;
-        }
-        
-        .modal-title {
-            font-size: 20px;
-            font-weight: 700;
-            margin-bottom: 16px;
-        }
-        
-        .modal-buttons {
-            display: flex;
-            gap: 12px;
-            margin-top: 16px;
-        }
-        
-        .btn-modal {
-            flex: 1;
-            padding: 14px;
-            border-radius: 10px;
-            border: none;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-        }
-        
-        .btn-cancel {
-            background: var(--border);
-            color: var(--text);
-        }
-        
-        .btn-confirm {
-            background: var(--gold);
-            color: white;
-        }
-        
-        .btn-delete {
-            background: var(--error);
-            color: white;
-        }
-        
-        .reset-badge {
-            display: inline-block;
-            background: var(--gold);
-            color: white;
-            padding: 4px 12px;
-            border-radius: 12px;
-            font-size: 12px;
-            font-weight: 600;
-            margin-left: 8px;
-        }
-        
-        .btn-reset {
-            width: 100%;
-            padding: 12px;
-            background: var(--border);
-            border: 1px solid var(--gold);
-            border-radius: 10px;
-            color: var(--gold);
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            margin-top: 12px;
-        }
-        
-        .checklist-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 16px;
-        }
-        
-        .progress-indicator {
-            font-size: 14px;
-            color: var(--text-secondary);
-            font-weight: 600;
-        }
+        html,body{height:100%;}
+        body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden;-webkit-font-smoothing:antialiased;padding-bottom:90px;position:relative;}
+        body::before{content:'';position:fixed;inset:0;z-index:0;background:radial-gradient(ellipse 80% 60% at 20% -10%,rgba(209,144,40,0.18) 0%,transparent 60%),radial-gradient(ellipse 60% 50% at 80% 110%,rgba(120,60,10,0.22) 0%,transparent 55%);animation:gradShift 12s ease-in-out infinite alternate;pointer-events:none;}
+        @keyframes gradShift{0%{transform:scale(1) translateY(0);}50%{transform:scale(1.04) translateY(-12px);}100%{transform:scale(0.97) translateY(8px);}}
+
+        /* ── HEADER ── */
+        .header{position:relative;z-index:1;padding:52px 24px 16px;text-align:center;}
+        .header-logo{font-family:'Syne',sans-serif;font-size:11px;font-weight:700;letter-spacing:.25em;color:var(--gold);text-transform:uppercase;margin-bottom:6px;opacity:.9;}
+        .header h1{font-family:'Syne',sans-serif;font-size:26px;font-weight:800;background:linear-gradient(135deg,#fff 30%,rgba(209,144,40,.8));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+
+        /* ── NAV ── */
+        .bottom-nav{position:fixed;bottom:0;left:0;right:0;background:rgba(10,10,10,.9);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:1px solid var(--border);display:flex;padding:10px 0;padding-bottom:max(10px,env(safe-area-inset-bottom));z-index:99;}
+        .nav-item{flex:1;text-align:center;padding:6px;cursor:pointer;transition:all .3s;position:relative;}
+        .nav-icon{opacity:.35;transition:all .3s;font-size:20px;display:block;margin-bottom:3px;}
+        .nav-item.active .nav-icon{opacity:1;}
+        .nav-label{font-family:'Syne',sans-serif;font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text-sec);transition:all .3s;}
+        .nav-item.active .nav-label{color:var(--gold);}
+        .nav-item.active::after{content:'';position:absolute;bottom:-1px;left:20%;right:20%;height:2px;background:var(--gold);border-radius:2px;}
+
+        /* ── CONTENT ── */
+        .content{padding:14px 18px;display:none;position:relative;z-index:1;}
+        .content.active{display:block;animation:fadeUp .35s cubic-bezier(.16,1,.3,1);}
+        @keyframes fadeUp{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:translateY(0);}}
+
+        /* ── CARD ── */
+        .card{background:var(--card);border-radius:20px;padding:20px;margin-bottom:14px;border:1px solid var(--border);backdrop-filter:blur(10px);}
+        .card-title{font-family:'Syne',sans-serif;font-size:11px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--text-sec);margin-bottom:16px;}
+
+        /* ── TIMER ── */
+        .timer-display{font-family:'Share Tech Mono',monospace;font-size:52px;font-weight:400;text-align:center;font-variant-numeric:tabular-nums;letter-spacing:.06em;color:var(--gold-light);text-shadow:0 0 10px rgba(209,144,40,.8),0 0 30px rgba(209,144,40,.4),0 0 60px rgba(209,144,40,.15);margin:14px 0 22px;}
+        .timer-display.running{animation:timerPulse 2s ease-in-out infinite;}
+        @keyframes timerPulse{0%,100%{opacity:1;}50%{opacity:.65;}}
+
+        /* Project selector */
+        .project-select-wrap{margin-bottom:16px;}
+        .project-select-label{font-family:'Syne',sans-serif;font-size:10px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--text-sec);margin-bottom:8px;}
+        .project-pills{display:flex;gap:8px;flex-wrap:wrap;}
+        .project-pill{padding:7px 14px;border-radius:50px;border:1px solid var(--border);background:transparent;color:var(--text-sec);font-family:'Syne',sans-serif;font-size:11px;font-weight:700;letter-spacing:.06em;cursor:pointer;transition:all .25s;}
+        .project-pill.selected{background:rgba(209,144,40,.15);border-color:var(--gold);color:var(--gold);}
+
+        /* Buttons */
+        .btn-main{width:100%;padding:17px;border-radius:14px;border:none;font-family:'Syne',sans-serif;font-size:14px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#fff;cursor:pointer;transition:all .25s cubic-bezier(.16,1,.3,1);position:relative;overflow:hidden;}
+        .btn-main:active{transform:scale(.975);}
+        .btn-start{background:linear-gradient(135deg,var(--gold-light),var(--gold),var(--gold-dark));background-size:200% 200%;animation:btnGlow 4s ease infinite;box-shadow:0 8px 32px rgba(209,144,40,.3);}
+        @keyframes btnGlow{0%,100%{background-position:0% 50%;box-shadow:0 8px 32px rgba(209,144,40,.3);}50%{background-position:100% 50%;box-shadow:0 8px 40px rgba(209,144,40,.5);}}
+        .btn-stop{background:linear-gradient(135deg,#F87171,#DC2626);box-shadow:0 8px 32px rgba(248,113,113,.25);animation:none;}
+
+        .running-pill{display:none;align-items:center;justify-content:center;gap:8px;margin-top:12px;padding:9px 20px;background:rgba(52,211,153,.1);border:1px solid rgba(52,211,153,.25);border-radius:50px;font-family:'Syne',sans-serif;font-size:11px;font-weight:700;letter-spacing:.1em;color:var(--success);text-transform:uppercase;}
+        .pulse-dot{width:7px;height:7px;background:var(--success);border-radius:50%;animation:pulseDot 1.4s ease-in-out infinite;}
+        @keyframes pulseDot{0%,100%{transform:scale(1);opacity:1;}50%{transform:scale(1.6);opacity:.5;}}
+
+        /* Stats */
+        .progress-stats{display:flex;justify-content:space-around;margin:4px 0 18px;}
+        .stat{text-align:center;}
+        .stat-value{font-family:'Syne',sans-serif;font-size:30px;font-weight:800;color:var(--gold);margin-bottom:3px;line-height:1;}
+        .stat-label{font-size:10px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--text-sec);}
+        .stat-divider{width:1px;background:var(--border);align-self:stretch;}
+        .progress-bar-container{height:3px;background:rgba(255,255,255,.08);border-radius:4px;overflow:hidden;margin-bottom:8px;}
+        .progress-bar{height:100%;background:linear-gradient(90deg,var(--gold-dark),var(--gold-light));border-radius:4px;transition:width .6s cubic-bezier(.16,1,.3,1);}
+        .progress-percent{text-align:right;font-family:'Syne',sans-serif;font-size:11px;font-weight:700;color:var(--gold);letter-spacing:.05em;}
+
+        /* History */
+        .history-item{display:flex;justify-content:space-between;align-items:center;padding:11px 0;border-bottom:1px solid var(--border);}
+        .history-item:last-child{border-bottom:none;}
+        .history-date{font-size:13px;font-weight:500;color:var(--text-sec);}
+        .history-meta{text-align:right;}
+        .history-duration{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:var(--gold);}
+        .history-project{font-size:10px;color:var(--text-sec);margin-top:2px;letter-spacing:.05em;}
+        .empty-text{text-align:center;color:var(--text-sec);padding:30px 20px;font-size:13px;line-height:1.8;}
+
+        /* ── PROJECTS TAB ── */
+        .project-card{background:var(--card);border-radius:20px;padding:18px;margin-bottom:12px;border:1px solid var(--border);cursor:pointer;transition:all .25s;}
+        .project-card:active{transform:scale(.98);}
+        .project-card-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;}
+        .project-name{font-family:'Syne',sans-serif;font-size:16px;font-weight:800;}
+        .project-actions{display:flex;gap:8px;}
+        .btn-icon{background:transparent;border:none;color:var(--text-sec);font-size:16px;cursor:pointer;padding:4px;transition:color .2s;}
+        .btn-icon:hover{color:var(--gold);}
+        .project-hours-row{display:flex;align-items:baseline;gap:6px;margin-bottom:10px;}
+        .project-hours-big{font-family:'Share Tech Mono',monospace;font-size:28px;color:var(--gold);text-shadow:0 0 8px rgba(209,144,40,.5);}
+        .project-hours-target{font-size:12px;color:var(--text-sec);}
+        .project-bar-container{height:3px;background:rgba(255,255,255,.08);border-radius:4px;overflow:hidden;}
+        .project-bar{height:100%;background:linear-gradient(90deg,var(--gold-dark),var(--gold-light));border-radius:4px;transition:width .6s;}
+        .project-last{font-size:11px;color:var(--text-sec);margin-top:8px;}
+
+        .btn-add-project{width:100%;padding:14px;background:transparent;border:1.5px dashed rgba(255,255,255,.12);border-radius:16px;color:var(--text-sec);font-family:'Syne',sans-serif;font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;transition:all .25s;margin-top:2px;}
+        .btn-add-project:hover{border-color:var(--gold);color:var(--gold);}
+
+        /* ── NOTES TAB ── */
+        .notes-project-tabs{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;margin-bottom:14px;scrollbar-width:none;}
+        .notes-project-tabs::-webkit-scrollbar{display:none;}
+        .notes-tab{padding:7px 16px;border-radius:50px;border:1px solid var(--border);background:transparent;color:var(--text-sec);font-family:'Syne',sans-serif;font-size:11px;font-weight:700;letter-spacing:.06em;white-space:nowrap;cursor:pointer;transition:all .25s;flex-shrink:0;}
+        .notes-tab.active{background:rgba(209,144,40,.15);border-color:var(--gold);color:var(--gold);}
+
+        .note-item{background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:14px;padding:14px;margin-bottom:10px;position:relative;}
+        .note-date{font-size:10px;color:var(--text-sec);letter-spacing:.05em;margin-bottom:6px;}
+        .note-text{font-size:14px;line-height:1.6;color:var(--text);white-space:pre-wrap;}
+        .note-delete{position:absolute;top:10px;right:10px;background:transparent;border:none;color:var(--text-sec);font-size:14px;cursor:pointer;opacity:0;transition:opacity .2s;}
+        .note-item:hover .note-delete{opacity:1;}
+
+        .note-input-wrap{background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:14px;padding:14px;margin-bottom:10px;transition:border-color .2s;}
+        .note-input-wrap:focus-within{border-color:var(--gold);}
+        textarea{width:100%;background:transparent;border:none;color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;line-height:1.6;resize:none;min-height:72px;}
+        textarea:focus{outline:none;}
+        textarea::placeholder{color:var(--text-sec);}
+        .btn-save-note{width:100%;padding:13px;border-radius:12px;border:none;background:linear-gradient(135deg,var(--gold-light),var(--gold-dark));color:#fff;font-family:'Syne',sans-serif;font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;transition:all .25s;}
+        .btn-save-note:active{transform:scale(.98);}
+
+        /* ── CHECKLIST TAB ── */
+        .checklist-header-row{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:18px;}
+        .month-badge{display:inline-flex;align-items:center;gap:5px;background:rgba(209,144,40,.12);border:1px solid var(--border-gold);color:var(--gold);padding:5px 12px;border-radius:50px;font-family:'Syne',sans-serif;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;white-space:nowrap;}
+        .progress-indicator{font-size:11px;font-weight:500;color:var(--text-sec);margin-top:4px;}
+        .checklist-item{display:flex;align-items:center;padding:13px 14px;background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:13px;margin-bottom:9px;cursor:pointer;transition:all .25s;}
+        .checklist-item:active{transform:scale(.98);}
+        .checklist-item.checked{background:rgba(52,211,153,.06);border-color:rgba(52,211,153,.2);}
+        .checkbox{width:22px;height:22px;border:1.5px solid rgba(255,255,255,.2);border-radius:6px;margin-right:12px;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;transition:all .25s;}
+        .checklist-item.checked .checkbox{background:var(--success);border-color:var(--success);}
+        .checklist-text{flex:1;font-size:13px;font-weight:500;}
+        .checklist-item.checked .checklist-text{text-decoration:line-through;opacity:.35;}
+        .btn-delete-task{width:26px;height:26px;border-radius:6px;background:transparent;border:none;color:var(--error);font-size:13px;cursor:pointer;margin-left:6px;opacity:0;transition:opacity .2s;}
+        .checklist-item:hover .btn-delete-task{opacity:1;}
+        .btn-add{width:100%;padding:13px;background:transparent;border:1.5px dashed rgba(255,255,255,.12);border-radius:13px;color:var(--text-sec);font-family:'Syne',sans-serif;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;transition:all .25s;margin-top:2px;}
+        .btn-add:hover{border-color:var(--gold);color:var(--gold);}
+        .btn-reset{width:100%;padding:11px;background:transparent;border:1px solid var(--border-gold);border-radius:11px;color:var(--gold);font-family:'Syne',sans-serif;font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;margin-top:9px;transition:all .25s;}
+        .btn-reset:hover{background:rgba(209,144,40,.08);}
+
+        /* ── INPUTS ── */
+        input[type="text"]{width:100%;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:12px;color:var(--text);padding:13px 15px;font-size:15px;font-family:'DM Sans',sans-serif;margin-bottom:11px;transition:border-color .2s;}
+        input:focus{outline:none;border-color:var(--gold);}
+        input::placeholder{color:var(--text-sec);}
+
+        /* ── MODAL ── */
+        .modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);z-index:1000;align-items:flex-end;justify-content:center;padding:0 0 max(20px,env(safe-area-inset-bottom)) 0;}
+        .modal.show{display:flex;animation:modalIn .3s;}
+        @keyframes modalIn{from{opacity:0;}to{opacity:1;}}
+        .modal-content{background:#111;border:1px solid var(--border);border-radius:24px 24px 20px 20px;padding:24px 22px;width:100%;max-width:480px;animation:sheetUp .35s cubic-bezier(.16,1,.3,1);}
+        @keyframes sheetUp{from{transform:translateY(40px);opacity:0;}to{transform:translateY(0);opacity:1;}}
+        .modal-handle{width:36px;height:4px;background:rgba(255,255,255,.12);border-radius:2px;margin:0 auto 18px;}
+        .modal-title{font-family:'Syne',sans-serif;font-size:17px;font-weight:800;margin-bottom:14px;}
+        .modal-buttons{display:flex;gap:10px;margin-top:14px;}
+        .btn-modal{flex:1;padding:13px;border-radius:11px;border:none;font-family:'Syne',sans-serif;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;transition:all .2s;}
+        .btn-modal:active{transform:scale(.97);}
+        .btn-cancel{background:rgba(255,255,255,.08);color:var(--text);}
+        .btn-confirm{background:linear-gradient(135deg,var(--gold-light),var(--gold-dark));color:#fff;}
+        .session-duration-big{font-family:'Share Tech Mono',monospace;font-size:40px;color:var(--gold);text-shadow:0 0 10px rgba(209,144,40,.6);text-align:center;margin:8px 0 4px;}
+        .modal-sub{font-size:12px;color:var(--text-sec);text-align:center;margin-bottom:2px;}
+        .modal-project-name{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:var(--gold);text-align:center;margin-bottom:10px;}
+
+        /* Color dots for projects */
+        .color-dot{width:10px;height:10px;border-radius:50%;display:inline-block;margin-right:8px;flex-shrink:0;}
     </style>
 </head>
 <body>
-    <div class="header">
-        <h1>⏱️ ATELIER PAUL</h1>
-        <p>Focus Timer & Checklist</p>
-    </div>
-    
-    <div class="content active" id="timer-content">
-        <div class="card">
-            <div class="timer-display" id="timer-display">0h 00m 00s</div>
-            <button class="btn-main btn-start" id="timer-btn" onclick="toggleTimer()">
-                ▶️ START
-            </button>
-            <div class="running-text" id="running-text" style="display: none;">
-                🔥 Session en cours...
-            </div>
-        </div>
-        
-        <div class="card">
-            <div class="card-title">📊 Ce mois-ci</div>
-            <div class="progress-stats">
-                <div class="stat">
-                    <div class="stat-value" id="hours-done">0h</div>
-                    <div class="stat-label">Réalisées</div>
-                </div>
-                <div class="stat">
-                    <div class="stat-value">10h</div>
-                    <div class="stat-label">Objectif</div>
-                </div>
-            </div>
-            <div class="progress-bar-container">
-                <div class="progress-bar" id="progress-bar" style="width: 0%"></div>
-            </div>
-            <div class="progress-percent" id="progress-percent">0%</div>
-        </div>
-        
-        <div class="card">
-            <div class="card-title">📋 Historique</div>
-            <div id="history-list">
-                <div class="empty-text">Aucune session enregistrée.<br>Lancez votre premier timer ! 🚀</div>
-            </div>
-        </div>
-    </div>
-    
-    <div class="content" id="checklist-content">
-        <div class="card">
-            <div class="checklist-header">
-                <div>
-                    <div class="card-title" style="margin-bottom: 4px;">
-                        ✅ À faire 🔄
-                        <span class="reset-badge" id="current-month">Février</span>
-                    </div>
-                    <div class="progress-indicator" id="checklist-progress">0/0 complétées</div>
-                </div>
-            </div>
-            <div id="checklist-items"></div>
-            <button class="btn-add" onclick="showAddModal()">+ Ajouter une tâche</button>
-            <button class="btn-reset" onclick="resetChecklist()">🔄 Nouveau mois - Décocher tout</button>
-        </div>
-    </div>
-    
-    <div class="bottom-nav">
-        <div class="nav-item active" onclick="switchTab('timer')">
-            <span class="nav-icon">⏱️</span>
-            <span class="nav-label">Timer</span>
-        </div>
-        <div class="nav-item" onclick="switchTab('checklist')">
-            <span class="nav-icon">✅</span>
-            <span class="nav-label">À faire</span>
-        </div>
-    </div>
-    
-    <div class="modal" id="add-modal">
-        <div class="modal-content">
-            <div class="modal-title">➕ Nouvelle tâche</div>
-            <input type="text" id="new-task-input" placeholder="Ex: Envoyer facture ATELIER PAUL">
-            <div class="modal-buttons">
-                <button class="btn-modal btn-cancel" onclick="hideAddModal()">Annuler</button>
-                <button class="btn-modal btn-confirm" onclick="addTask()">Ajouter</button>
-            </div>
-        </div>
-    </div>
-    
-    <div class="modal" id="stop-modal">
-        <div class="modal-content">
-            <div class="modal-title">⏹️ Session terminée</div>
-            <p style="color: var(--text-secondary); margin-bottom: 16px;">
-                Durée: <strong id="session-duration" style="color: var(--gold);">1h 23m</strong>
-            </p>
-            <p style="color: var(--text-secondary);">Enregistrer cette session ?</p>
-            <div class="modal-buttons">
-                <button class="btn-modal btn-cancel" onclick="cancelSession()">Annuler</button>
-                <button class="btn-modal btn-confirm" onclick="saveSession()">Enregistrer</button>
-            </div>
-        </div>
-    </div>
 
-    <script>
-        // Tâches récurrentes par défaut (VOS vraies tâches)
-        const DEFAULT_TASKS = [
-            'PASS NAVIGO',
-            'ENVOYÉ JUSTIFICATIF',
-            'FACTURE (ATELIER PAUL)',
-            'DÉCLARATION URSSAF (1166€ max avant 31/03)',
-            '95 papa assurance voiture',
-            'Acheter PNEU',
-            'RIB Compte AMELI'
-        ];
-        
-        let timerInterval = null;
-        let seconds = 0;
-        let isRunning = false;
-        let sessions = [];
-        let checklist = [];
-        let currentMonth = new Date().getMonth();
-        
-        function loadData() {
-            const savedSessions = localStorage.getItem('sessions');
-            const savedChecklist = localStorage.getItem('checklist');
-            const savedMonth = localStorage.getItem('checklistMonth');
-            
-            if (savedSessions) {
-                sessions = JSON.parse(savedSessions);
-                updateStats();
-                renderHistory();
-            }
-            
-            if (savedChecklist) {
-                checklist = JSON.parse(savedChecklist);
-            } else {
-                // Première installation : créer les tâches par défaut
-                checklist = DEFAULT_TASKS.map(text => ({
-                    text: text,
-                    checked: false
-                }));
-                localStorage.setItem('checklist', JSON.stringify(checklist));
-            }
-            
-            if (savedMonth && parseInt(savedMonth) !== currentMonth) {
-                resetChecklistForNewMonth();
-            }
-            
-            renderChecklist();
-            updateMonthBadge();
-        }
-        
-        function toggleTimer() {
-            if (isRunning) {
-                stopTimer();
-            } else {
-                startTimer();
-            }
-        }
-        
-        function startTimer() {
-            isRunning = true;
-            document.getElementById('timer-btn').className = 'btn-main btn-stop';
-            document.getElementById('timer-btn').innerHTML = '⏹️ STOP';
-            document.getElementById('running-text').style.display = 'block';
-            
-            timerInterval = setInterval(() => {
-                seconds++;
-                updateTimerDisplay();
-                
-                if (seconds === 3600) {
-                    if ('Notification' in window && Notification.permission === 'granted') {
-                        new Notification('⏰ 1 heure écoulée !', {
-                            body: 'Votre session de focus est terminée.'
-                        });
-                    }
-                }
-            }, 1000);
-        }
-        
-        function stopTimer() {
-            if (seconds === 0) return;
-            
-            clearInterval(timerInterval);
-            isRunning = false;
-            
-            document.getElementById('session-duration').textContent = formatTime(seconds);
-            document.getElementById('stop-modal').classList.add('show');
-        }
-        
-        function cancelSession() {
-            seconds = 0;
-            updateTimerDisplay();
-            resetTimerButton();
-            document.getElementById('stop-modal').classList.remove('show');
-        }
-        
-        function saveSession() {
-            const duration = seconds / 3600;
-            const session = {
-                id: Date.now(),
-                date: new Date().toISOString(),
-                duration: duration
-            };
-            
-            sessions.unshift(session);
-            localStorage.setItem('sessions', JSON.stringify(sessions));
-            
-            seconds = 0;
-            updateTimerDisplay();
-            resetTimerButton();
-            updateStats();
-            renderHistory();
-            
-            document.getElementById('stop-modal').classList.remove('show');
-            
-            if ('Notification' in window && Notification.permission === 'granted') {
-                new Notification('✅ Session enregistrée !', {
-                    body: `${formatTime(duration * 3600)} ajoutées à ATELIER PAUL`
-                });
-            }
-        }
-        
-        function resetTimerButton() {
-            document.getElementById('timer-btn').className = 'btn-main btn-start';
-            document.getElementById('timer-btn').innerHTML = '▶️ START';
-            document.getElementById('running-text').style.display = 'none';
-        }
-        
-        function updateTimerDisplay() {
-            document.getElementById('timer-display').textContent = formatTime(seconds);
-        }
-        
-        function formatTime(totalSeconds) {
-            const hours = Math.floor(totalSeconds / 3600);
-            const minutes = Math.floor((totalSeconds % 3600) / 60);
-            const secs = totalSeconds % 60;
-            
-            return `${hours}h ${minutes.toString().padStart(2, '0')}m ${secs.toString().padStart(2, '0')}s`;
-        }
-        
-        function updateStats() {
-            const now = new Date();
-            const monthSessions = sessions.filter(s => {
-                const sessionDate = new Date(s.date);
-                return sessionDate.getMonth() === now.getMonth() && 
-                       sessionDate.getFullYear() === now.getFullYear();
-            });
-            
-            const total = monthSessions.reduce((acc, s) => acc + s.duration, 0);
-            const percent = Math.min(100, (total / 10) * 100);
-            
-            document.getElementById('hours-done').textContent = total.toFixed(1) + 'h';
-            document.getElementById('progress-bar').style.width = percent + '%';
-            document.getElementById('progress-percent').textContent = percent.toFixed(0) + '%';
-        }
-        
-        function renderHistory() {
-            const container = document.getElementById('history-list');
-            
-            if (sessions.length === 0) {
-                container.innerHTML = '<div class="empty-text">Aucune session enregistrée.<br>Lancez votre premier timer ! 🚀</div>';
-                return;
-            }
-            
-            container.innerHTML = sessions.slice(0, 20).map(s => {
-                const date = new Date(s.date);
-                const formatted = formatDate(date);
-                return `
-                    <div class="history-item">
-                        <div class="history-date">${formatted}</div>
-                        <div class="history-duration">${s.duration.toFixed(2)}h</div>
-                    </div>
-                `;
-            }).join('');
-        }
-        
-        function formatDate(date) {
-            const days = ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'];
-            const months = ['jan', 'fév', 'mar', 'avr', 'mai', 'juin', 'juil', 'août', 'sep', 'oct', 'nov', 'déc'];
-            return `${days[date.getDay()]} ${date.getDate()} ${months[date.getMonth()]}`;
-        }
-        
-        function renderChecklist() {
-            const container = document.getElementById('checklist-items');
-            
-            if (checklist.length === 0) {
-                container.innerHTML = '<div class="empty-text">Aucune tâche.<br>Ajoutez vos tâches récurrentes ! ✅</div>';
-                updateChecklistProgress();
-                return;
-            }
-            
-            container.innerHTML = checklist.map((task, index) => `
-                <div class="checklist-item ${task.checked ? 'checked' : ''}" onclick="toggleCheck(event, ${index})">
-                    <div class="checkbox">${task.checked ? '✓' : ''}</div>
-                    <div class="checklist-text">${task.text}</div>
-                    <button class="btn-delete-task" onclick="deleteTask(event, ${index})">🗑️</button>
+<div class="header">
+    <div class="header-logo">Atelier Paul</div>
+    <h1>Organizer</h1>
+</div>
+
+<!-- ── TIMER ── -->
+<div class="content active" id="tab-timer">
+    <div class="card">
+        <div class="card-title">Session de travail</div>
+        <div class="project-select-wrap">
+            <div class="project-select-label">Projet</div>
+            <div class="project-pills" id="timer-project-pills"></div>
+        </div>
+        <div class="timer-display" id="timer-display">00:00:00</div>
+        <button class="btn-main btn-start" id="timer-btn" onclick="toggleTimer()">▶ &nbsp;Démarrer</button>
+        <div class="running-pill" id="running-text"><div class="pulse-dot"></div>Session active</div>
+    </div>
+    <div class="card">
+        <div class="card-title">Ce mois-ci</div>
+        <div class="progress-stats">
+            <div class="stat"><div class="stat-value" id="hours-done">0h</div><div class="stat-label">Réalisées</div></div>
+            <div class="stat-divider"></div>
+            <div class="stat"><div class="stat-value">10h</div><div class="stat-label">Objectif</div></div>
+        </div>
+        <div class="progress-bar-container"><div class="progress-bar" id="progress-bar" style="width:0%"></div></div>
+        <div class="progress-percent" id="progress-percent">0%</div>
+    </div>
+    <div class="card">
+        <div class="card-title">Historique</div>
+        <div id="history-list"><div class="empty-text">Aucune session enregistrée.<br>Lance ton premier timer 🚀</div></div>
+    </div>
+</div>
+
+<!-- ── PROJETS ── -->
+<div class="content" id="tab-projects">
+    <div id="projects-list"></div>
+    <button class="btn-add-project" onclick="showAddProjectModal()">+ Nouveau projet / client</button>
+</div>
+
+<!-- ── NOTES ── -->
+<div class="content" id="tab-notes">
+    <div class="notes-project-tabs" id="notes-tabs"></div>
+    <div class="card" id="notes-input-card">
+        <div class="note-input-wrap">
+            <textarea id="note-textarea" placeholder="Note rapide…" rows="3"></textarea>
+        </div>
+        <button class="btn-save-note" onclick="saveNote()">Enregistrer la note</button>
+    </div>
+    <div id="notes-list"></div>
+</div>
+
+<!-- ── CHECKLIST ── -->
+<div class="content" id="tab-checklist">
+    <div class="card">
+        <div class="checklist-header-row">
+            <div>
+                <div class="card-title" style="margin-bottom:5px;">À faire ce mois</div>
+                <div class="progress-indicator" id="checklist-progress">0/0 complétées</div>
+            </div>
+            <div class="month-badge">📅 <span id="current-month">Mars</span></div>
+        </div>
+        <div id="checklist-items"></div>
+        <button class="btn-add" onclick="showAddTaskModal()">+ Ajouter une tâche</button>
+        <button class="btn-reset" onclick="resetChecklist()">↺ &nbsp;Nouveau mois — Tout décocher</button>
+    </div>
+</div>
+
+<!-- ── NAV ── -->
+<div class="bottom-nav">
+    <div class="nav-item active" onclick="switchTab('timer')"><span class="nav-icon">⏱</span><span class="nav-label">Timer</span></div>
+    <div class="nav-item" onclick="switchTab('projects')"><span class="nav-icon">📁</span><span class="nav-label">Projets</span></div>
+    <div class="nav-item" onclick="switchTab('notes')"><span class="nav-icon">📝</span><span class="nav-label">Notes</span></div>
+    <div class="nav-item" onclick="switchTab('checklist')"><span class="nav-icon">✅</span><span class="nav-label">À faire</span></div>
+</div>
+
+<!-- MODAL: stop session -->
+<div class="modal" id="stop-modal">
+    <div class="modal-content">
+        <div class="modal-handle"></div>
+        <div class="modal-title">Session terminée</div>
+        <div class="modal-sub">Durée</div>
+        <div class="session-duration-big" id="session-duration">00:00</div>
+        <div class="modal-project-name" id="session-project-name"></div>
+        <div class="modal-sub">Enregistrer cette session ?</div>
+        <div class="modal-buttons">
+            <button class="btn-modal btn-cancel" onclick="cancelSession()">Annuler</button>
+            <button class="btn-modal btn-confirm" onclick="saveSession()">Enregistrer</button>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL: add project -->
+<div class="modal" id="add-project-modal">
+    <div class="modal-content">
+        <div class="modal-handle"></div>
+        <div class="modal-title">Nouveau projet</div>
+        <input type="text" id="project-name-input" placeholder="Ex : ATELIER PAUL">
+        <input type="text" id="project-target-input" placeholder="Objectif mensuel (ex: 10)">
+        <div class="modal-buttons">
+            <button class="btn-modal btn-cancel" onclick="hideModal('add-project-modal')">Annuler</button>
+            <button class="btn-modal btn-confirm" onclick="addProject()">Créer</button>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL: add task -->
+<div class="modal" id="add-task-modal">
+    <div class="modal-content">
+        <div class="modal-handle"></div>
+        <div class="modal-title">Nouvelle tâche</div>
+        <input type="text" id="new-task-input" placeholder="Ex : Facture ATELIER PAUL">
+        <div class="modal-buttons">
+            <button class="btn-modal btn-cancel" onclick="hideModal('add-task-modal')">Annuler</button>
+            <button class="btn-modal btn-confirm" onclick="addTask()">Ajouter</button>
+        </div>
+    </div>
+</div>
+
+<script>
+// ── DATA ──
+const PROJECT_COLORS = ['#D19028','#34D399','#60A5FA','#F87171','#A78BFA','#FB923C','#E879F9'];
+const DEFAULT_TASKS = ['PASS NAVIGO','ENVOYÉ JUSTIFICATIF','FACTURE (ATELIER PAUL)','DÉCLARATION URSSAF (1166€ max avant 31/03)','95 papa assurance voiture','Acheter PNEU','RIB Compte AMELI'];
+
+let timerInterval=null, seconds=0, isRunning=false;
+let sessions=[], projects=[], checklist=[], notes=[];
+let selectedProjectId=null, currentMonth=new Date().getMonth();
+let activeNotesProjectId=null;
+
+function save(key,val){localStorage.setItem(key,JSON.stringify(val));}
+function load(key,def=[]){const v=localStorage.getItem(key);return v?JSON.parse(v):def;}
+
+function init(){
+    sessions=load('sessions');
+    projects=load('projects',[
+        {id:'ap',name:'ATELIER PAUL',color:PROJECT_COLORS[0],target:10},
+        {id:'po',name:'PANAM OPTIC',color:PROJECT_COLORS[1],target:0}
+    ]);
+    checklist=load('checklist');
+    notes=load('notes');
+
+    if(!checklist.length){
+        checklist=DEFAULT_TASKS.map(t=>({text:t,checked:false}));
+        save('checklist',checklist);
+    }
+
+    const sm=localStorage.getItem('checklistMonth');
+    if(sm && parseInt(sm)!==currentMonth) resetChecklistForNewMonth();
+
+    if(projects.length) selectedProjectId=projects[0].id;
+
+    renderAll();
+}
+
+function renderAll(){
+    renderTimerPills();
+    renderProjects();
+    renderNotesTabs();
+    renderNotes();
+    renderHistory();
+    updateStats();
+    renderChecklist();
+    updateMonthBadge();
+}
+
+// ── TIMER ──
+function toggleTimer(){ isRunning?stopTimer():startTimer(); }
+
+function startTimer(){
+    if(!selectedProjectId){alert('Sélectionne un projet d\'abord.');return;}
+    isRunning=true;
+    const btn=document.getElementById('timer-btn');
+    btn.className='btn-main btn-stop';
+    btn.innerHTML='⏹ &nbsp;Arrêter';
+    document.getElementById('timer-display').classList.add('running');
+    document.getElementById('running-text').style.display='flex';
+    timerInterval=setInterval(()=>{seconds++;updateTimerDisplay();},1000);
+}
+
+function stopTimer(){
+    if(seconds===0){isRunning=false;resetTimerButton();return;}
+    clearInterval(timerInterval);
+    isRunning=false;
+    document.getElementById('session-duration').textContent=formatTime(seconds);
+    const p=projects.find(p=>p.id===selectedProjectId);
+    document.getElementById('session-project-name').textContent=p?p.name:'';
+    showModal('stop-modal');
+}
+
+function cancelSession(){seconds=0;updateTimerDisplay();resetTimerButton();hideModal('stop-modal');}
+
+function saveSession(){
+    const p=projects.find(p=>p.id===selectedProjectId);
+    sessions.unshift({id:Date.now(),date:new Date().toISOString(),duration:seconds/3600,projectId:selectedProjectId,projectName:p?p.name:'—'});
+    save('sessions',sessions);
+    seconds=0;updateTimerDisplay();resetTimerButton();
+    updateStats();renderHistory();renderProjects();
+    hideModal('stop-modal');
+}
+
+function resetTimerButton(){
+    const btn=document.getElementById('timer-btn');
+    btn.className='btn-main btn-start';
+    btn.innerHTML='▶ &nbsp;Démarrer';
+    document.getElementById('timer-display').classList.remove('running');
+    document.getElementById('running-text').style.display='none';
+}
+
+function updateTimerDisplay(){document.getElementById('timer-display').textContent=formatTime(seconds);}
+function formatTime(s){const h=Math.floor(s/3600),m=Math.floor((s%3600)/60),sec=s%60;return`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;}
+
+function renderTimerPills(){
+    const c=document.getElementById('timer-project-pills');
+    if(!projects.length){c.innerHTML='<span style="color:var(--text-sec);font-size:12px;">Crée d\'abord un projet 👆</span>';return;}
+    c.innerHTML=projects.map(p=>`
+        <button class="project-pill ${selectedProjectId===p.id?'selected':''}" 
+            style="${selectedProjectId===p.id?`border-color:${p.color};color:${p.color};background:${p.color}22`:''}"
+            onclick="selectTimerProject('${p.id}')">
+            <span class="color-dot" style="background:${p.color}"></span>${p.name}
+        </button>`).join('');
+}
+
+function selectTimerProject(id){
+    if(isRunning)return;
+    selectedProjectId=id;
+    renderTimerPills();
+}
+
+// ── STATS ──
+function updateStats(){
+    const now=new Date();
+    const ms=sessions.filter(s=>{const d=new Date(s.date);return d.getMonth()===now.getMonth()&&d.getFullYear()===now.getFullYear();});
+    const total=ms.reduce((a,s)=>a+s.duration,0);
+    const pct=Math.min(100,(total/10)*100);
+    document.getElementById('hours-done').textContent=total.toFixed(1)+'h';
+    document.getElementById('progress-bar').style.width=pct+'%';
+    document.getElementById('progress-percent').textContent=pct.toFixed(0)+'%';
+}
+
+function renderHistory(){
+    const c=document.getElementById('history-list');
+    if(!sessions.length){c.innerHTML='<div class="empty-text">Aucune session enregistrée.<br>Lance ton premier timer 🚀</div>';return;}
+    c.innerHTML=sessions.slice(0,30).map(s=>`
+        <div class="history-item">
+            <div>
+                <div class="history-date">${formatDate(new Date(s.date))}</div>
+                <div class="history-project">${s.projectName||'—'}</div>
+            </div>
+            <div class="history-meta">
+                <div class="history-duration">${s.duration.toFixed(2)}h</div>
+            </div>
+        </div>`).join('');
+}
+
+function formatDate(d){
+    const days=['Dim','Lun','Mar','Mer','Jeu','Ven','Sam'];
+    const months=['jan','fév','mar','avr','mai','juin','juil','août','sep','oct','nov','déc'];
+    return`${days[d.getDay()]} ${d.getDate()} ${months[d.getMonth()]}`;
+}
+
+// ── PROJECTS ──
+function renderProjects(){
+    const c=document.getElementById('projects-list');
+    if(!projects.length){c.innerHTML='<div class="empty-text">Aucun projet.<br>Crée ton premier client 📁</div>';return;}
+    const now=new Date();
+    c.innerHTML=projects.map(p=>{
+        const allSessions=sessions.filter(s=>s.projectId===p.id);
+        const monthSessions=allSessions.filter(s=>{const d=new Date(s.date);return d.getMonth()===now.getMonth()&&d.getFullYear()===now.getFullYear();});
+        const totalAll=allSessions.reduce((a,s)=>a+s.duration,0);
+        const totalMonth=monthSessions.reduce((a,s)=>a+s.duration,0);
+        const target=p.target||0;
+        const pct=target>0?Math.min(100,(totalMonth/target)*100):0;
+        const lastSession=allSessions[0];
+        return`<div class="project-card">
+            <div class="project-card-header">
+                <div style="display:flex;align-items:center;">
+                    <span class="color-dot" style="background:${p.color};width:12px;height:12px;margin-right:10px;"></span>
+                    <span class="project-name">${p.name}</span>
                 </div>
-            `).join('');
-            
-            updateChecklistProgress();
-        }
-        
-        function toggleCheck(event, index) {
-            if (event.target.classList.contains('btn-delete-task')) return;
-            
-            checklist[index].checked = !checklist[index].checked;
-            localStorage.setItem('checklist', JSON.stringify(checklist));
-            renderChecklist();
-        }
-        
-        function deleteTask(event, index) {
-            event.stopPropagation();
-            
-            if (confirm(`Supprimer cette tâche ?\n"${checklist[index].text}"`)) {
-                checklist.splice(index, 1);
-                localStorage.setItem('checklist', JSON.stringify(checklist));
-                renderChecklist();
-            }
-        }
-        
-        function updateChecklistProgress() {
-            const total = checklist.length;
-            const checked = checklist.filter(t => t.checked).length;
-            document.getElementById('checklist-progress').textContent = `${checked}/${total} complétées`;
-        }
-        
-        function showAddModal() {
-            document.getElementById('add-modal').classList.add('show');
-            document.getElementById('new-task-input').value = '';
-            setTimeout(() => {
-                document.getElementById('new-task-input').focus();
-            }, 100);
-        }
-        
-        function hideAddModal() {
-            document.getElementById('add-modal').classList.remove('show');
-        }
-        
-        function addTask() {
-            const input = document.getElementById('new-task-input');
-            const text = input.value.trim();
-            
-            if (!text) return;
-            
-            checklist.push({
-                text: text,
-                checked: false
-            });
-            
-            localStorage.setItem('checklist', JSON.stringify(checklist));
-            renderChecklist();
-            hideAddModal();
-        }
-        
-        function resetChecklist() {
-            if (!confirm('🔄 Décocher toutes les tâches pour le nouveau mois ?')) return;
-            
-            checklist = checklist.map(task => ({
-                ...task,
-                checked: false
-            }));
-            
-            localStorage.setItem('checklist', JSON.stringify(checklist));
-            localStorage.setItem('checklistMonth', currentMonth.toString());
-            renderChecklist();
-        }
-        
-        function resetChecklistForNewMonth() {
-            checklist = checklist.map(task => ({
-                ...task,
-                checked: false
-            }));
-            localStorage.setItem('checklist', JSON.stringify(checklist));
-            localStorage.setItem('checklistMonth', currentMonth.toString());
-        }
-        
-        function updateMonthBadge() {
-            const months = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
-            document.getElementById('current-month').textContent = months[currentMonth];
-        }
-        
-        function switchTab(tab) {
-            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
-            document.querySelectorAll('.content').forEach(content => content.classList.remove('active'));
-            
-            if (tab === 'timer') {
-                document.querySelector('.nav-item:nth-child(1)').classList.add('active');
-                document.getElementById('timer-content').classList.add('active');
-            } else {
-                document.querySelector('.nav-item:nth-child(2)').classList.add('active');
-                document.getElementById('checklist-content').classList.add('active');
-            }
-        }
-        
-        if ('Notification' in window && Notification.permission === 'default') {
-            Notification.requestPermission();
-        }
-        
-        document.addEventListener('DOMContentLoaded', () => {
-            loadData();
-            
-            document.getElementById('new-task-input').addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') addTask();
-            });
-        });
-        
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('data:text/javascript,');
-        }
-    </script>
+                <div class="project-actions">
+                    <button class="btn-icon" onclick="deleteProject('${p.id}')">✕</button>
+                </div>
+            </div>
+            <div class="project-hours-row">
+                <div class="project-hours-big">${totalMonth.toFixed(1)}h</div>
+                <div class="project-hours-target">ce mois${target>0?' / '+target+'h obj.':''}</div>
+            </div>
+            ${target>0?`<div class="project-bar-container"><div class="project-bar" style="width:${pct}%;background:linear-gradient(90deg,${p.color}88,${p.color})"></div></div>`:''}
+            <div class="project-last">Total cumulé : <strong style="color:var(--gold)">${totalAll.toFixed(1)}h</strong>${lastSession?' · Dernière session : '+formatDate(new Date(lastSession.date)):''}</div>
+        </div>`;
+    }).join('');
+}
+
+function showAddProjectModal(){
+    document.getElementById('project-name-input').value='';
+    document.getElementById('project-target-input').value='';
+    showModal('add-project-modal');
+    setTimeout(()=>document.getElementById('project-name-input').focus(),100);
+}
+
+function addProject(){
+    const name=document.getElementById('project-name-input').value.trim();
+    const target=parseFloat(document.getElementById('project-target-input').value)||0;
+    if(!name)return;
+    const color=PROJECT_COLORS[projects.length%PROJECT_COLORS.length];
+    projects.push({id:'p'+Date.now(),name,color,target});
+    save('projects',projects);
+    renderAll();
+    hideModal('add-project-modal');
+}
+
+function deleteProject(id){
+    if(!confirm('Supprimer ce projet ?'))return;
+    projects=projects.filter(p=>p.id!==id);
+    save('projects',projects);
+    if(selectedProjectId===id) selectedProjectId=projects[0]?.id||null;
+    renderAll();
+}
+
+// ── NOTES ──
+function renderNotesTabs(){
+    const c=document.getElementById('notes-tabs');
+    if(!projects.length){c.innerHTML='';return;}
+    if(!activeNotesProjectId) activeNotesProjectId=projects[0].id;
+    c.innerHTML=projects.map(p=>`
+        <button class="notes-tab ${activeNotesProjectId===p.id?'active':''}" 
+            style="${activeNotesProjectId===p.id?`border-color:${p.color};color:${p.color};background:${p.color}18`:''}"
+            onclick="switchNotesProject('${p.id}')">${p.name}</button>`).join('');
+}
+
+function switchNotesProject(id){
+    activeNotesProjectId=id;
+    renderNotesTabs();
+    renderNotes();
+}
+
+function saveNote(){
+    const ta=document.getElementById('note-textarea');
+    const text=ta.value.trim();
+    if(!text||!activeNotesProjectId)return;
+    const p=projects.find(p=>p.id===activeNotesProjectId);
+    notes.unshift({id:Date.now(),projectId:activeNotesProjectId,projectName:p?p.name:'',date:new Date().toISOString(),text});
+    save('notes',notes);
+    ta.value='';
+    renderNotes();
+}
+
+function deleteNote(id){
+    notes=notes.filter(n=>n.id!==id);
+    save('notes',notes);
+    renderNotes();
+}
+
+function renderNotes(){
+    const c=document.getElementById('notes-list');
+    const filtered=notes.filter(n=>n.projectId===activeNotesProjectId);
+    if(!filtered.length){c.innerHTML='<div class="empty-text">Aucune note pour ce projet.<br>Écris ta première note ✏️</div>';return;}
+    c.innerHTML=filtered.map(n=>`
+        <div class="note-item">
+            <div class="note-date">${formatDate(new Date(n.date))} · ${new Date(n.date).toLocaleTimeString('fr',{hour:'2-digit',minute:'2-digit'})}</div>
+            <div class="note-text">${n.text}</div>
+            <button class="note-delete" onclick="deleteNote(${n.id})">✕</button>
+        </div>`).join('');
+}
+
+// ── CHECKLIST ──
+function renderChecklist(){
+    const c=document.getElementById('checklist-items');
+    if(!checklist.length){c.innerHTML='<div class="empty-text">Aucune tâche.</div>';updateChecklistProgress();return;}
+    c.innerHTML=checklist.map((t,i)=>`
+        <div class="checklist-item ${t.checked?'checked':''}" onclick="toggleCheck(event,${i})">
+            <div class="checkbox">${t.checked?'✓':''}</div>
+            <div class="checklist-text">${t.text}</div>
+            <button class="btn-delete-task" onclick="deleteTask(event,${i})">✕</button>
+        </div>`).join('');
+    updateChecklistProgress();
+}
+
+function toggleCheck(e,i){if(e.target.classList.contains('btn-delete-task'))return;checklist[i].checked=!checklist[i].checked;save('checklist',checklist);renderChecklist();}
+function deleteTask(e,i){e.stopPropagation();if(confirm(`Supprimer ?\n"${checklist[i].text}"`)){checklist.splice(i,1);save('checklist',checklist);renderChecklist();}}
+function updateChecklistProgress(){const t=checklist.length,ch=checklist.filter(t=>t.checked).length;document.getElementById('checklist-progress').textContent=`${ch}/${t} complétées`;}
+function showAddTaskModal(){document.getElementById('new-task-input').value='';showModal('add-task-modal');setTimeout(()=>document.getElementById('new-task-input').focus(),100);}
+function addTask(){const v=document.getElementById('new-task-input').value.trim();if(!v)return;checklist.push({text:v,checked:false});save('checklist',checklist);renderChecklist();hideModal('add-task-modal');}
+function resetChecklist(){if(!confirm('Décocher toutes les tâches ?'))return;checklist=checklist.map(t=>({...t,checked:false}));save('checklist',checklist);save('checklistMonth',currentMonth.toString());renderChecklist();}
+function resetChecklistForNewMonth(){checklist=checklist.map(t=>({...t,checked:false}));save('checklist',checklist);save('checklistMonth',currentMonth.toString());}
+function updateMonthBadge(){const m=['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];document.getElementById('current-month').textContent=m[currentMonth];}
+
+// ── UI UTILS ──
+function showModal(id){document.getElementById(id).classList.add('show');}
+function hideModal(id){document.getElementById(id).classList.remove('show');}
+
+function switchTab(tab){
+    const tabs={timer:'tab-timer',projects:'tab-projects',notes:'tab-notes',checklist:'tab-checklist'};
+    document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+    document.querySelectorAll('.content').forEach(c=>c.classList.remove('active'));
+    document.getElementById(tabs[tab]).classList.add('active');
+    const idx={timer:0,projects:1,notes:2,checklist:3};
+    document.querySelectorAll('.nav-item')[idx[tab]].classList.add('active');
+}
+
+if('Notification'in window&&Notification.permission==='default')Notification.requestPermission();
+
+document.addEventListener('DOMContentLoaded',()=>{
+    init();
+    document.getElementById('new-task-input').addEventListener('keypress',e=>{if(e.key==='Enter')addTask();});
+    document.getElementById('project-name-input').addEventListener('keypress',e=>{if(e.key==='Enter')document.getElementById('project-target-input').focus();});
+    document.getElementById('project-target-input').addEventListener('keypress',e=>{if(e.key==='Enter')addProject();});
+});
+</script>
 </body>
 </html>
